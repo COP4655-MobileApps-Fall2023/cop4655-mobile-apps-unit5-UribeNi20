@@ -21,6 +21,15 @@ class FeedViewController: UIViewController {
             tableView.reloadData()
         }
     }
+    
+    deinit {
+            NotificationCenter.default.removeObserver(self, name: Notification.Name("postCreated"), object: nil)
+        }
+    
+    @objc private func postCreated() {
+        // Dismiss the alert if it is being displayed
+        presentedViewController?.dismiss(animated: true)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,6 +37,8 @@ class FeedViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.allowsSelection = false
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(postCreated), name: Notification.Name("postCreated"), object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -35,11 +46,13 @@ class FeedViewController: UIViewController {
 
         guard let currentUser = User.current, currentUser.hasPosted == true else {
             // Redirect to PostViewController or show an alert
+            showAlert(description: "You need to post in order to view the feed.")
             return
         }
         
         queryPosts()
     }
+    
 
     private func queryPosts() {
         // TODO: Pt 1 - Query Posts
@@ -70,6 +83,7 @@ class FeedViewController: UIViewController {
     @IBAction func onLogOutTapped(_ sender: Any) {
         showConfirmLogoutAlert()
     }
+    
 
     private func showConfirmLogoutAlert() {
         let alertController = UIAlertController(title: "Log out of your account?", message: nil, preferredStyle: .alert)

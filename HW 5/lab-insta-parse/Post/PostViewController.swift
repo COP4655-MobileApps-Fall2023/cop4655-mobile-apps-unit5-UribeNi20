@@ -96,6 +96,10 @@ class PostViewController: UIViewController {
                                     switch result {
                                     case .success:
                                         print("✅ User Updated!")
+                                        
+                                        // Post the notification here
+                                        NotificationCenter.default.post(name: Notification.Name("postCreated"), object: nil)
+                                        
                                     case .failure(let error):
                                         print("❌ Error updating user: \(error)")
                                     }
