@@ -43,15 +43,23 @@ class FeedViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
-        guard let currentUser = User.current, currentUser.hasPosted == true else {
-            // Redirect to PostViewController or show an alert
-            showAlert(description: "You need to post in order to view the feed.")
+        
+        guard let currentUser = User.current else {
+            // Show an alert or redirect to login if there is no current user
             return
         }
         
-        queryPosts()
+        if currentUser.hasPosted == true {
+            // Dismiss the alert if it is being displayed
+            presentedViewController?.dismiss(animated: true)
+            // Query and display the posts
+            queryPosts()
+        } else {
+            // Show an alert informing the user that they need to post in order to view the feed
+            showAlert(description: "You need to post in order to view the feed.")
+        }
     }
+
     
 
     private func queryPosts() {
