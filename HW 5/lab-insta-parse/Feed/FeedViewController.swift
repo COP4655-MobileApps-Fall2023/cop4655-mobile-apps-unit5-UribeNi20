@@ -33,6 +33,11 @@ class FeedViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
+        guard let currentUser = User.current, currentUser.hasPosted == true else {
+            // Redirect to PostViewController or show an alert
+            return
+        }
+        
         queryPosts()
     }
 

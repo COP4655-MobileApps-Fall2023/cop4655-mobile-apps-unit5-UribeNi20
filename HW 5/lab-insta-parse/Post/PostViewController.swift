@@ -80,13 +80,27 @@ class PostViewController: UIViewController {
 
         // Save object in background (async)
         post.save { [weak self] result in
-
+            
             // Switch to the main thread for any UI updates
             DispatchQueue.main.async {
                 switch result {
                 case .success(let post):
                     print("✅ Post Saved! \(post)")
-
+                    // Fetch the current user from the database
+                            if let currentUser = User.current {
+                                var userToUpdate = currentUser
+                                userToUpdate.hasPosted = true
+                                
+                                // Save the updated user back to the database
+                                userToUpdate.save { result in
+                                    switch result {
+                                    case .success:
+                                        print("✅ User Updated!")
+                                    case .failure(let error):
+                                        print("❌ Error updating user: \(error)")
+                                    }
+                                }
+                            }
                     // Return to previous view controller
                     self?.navigationController?.popViewController(animated: true)
 
@@ -96,7 +110,6 @@ class PostViewController: UIViewController {
             }
         }
 
-        
 
     }
 
