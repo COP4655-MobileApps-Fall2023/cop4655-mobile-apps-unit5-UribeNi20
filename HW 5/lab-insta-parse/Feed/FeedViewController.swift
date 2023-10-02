@@ -28,6 +28,8 @@ class FeedViewController: UIViewController {
     
     @objc private func postCreated() {
         // Dismiss the alert if it is being displayed
+        placeholderLabel.isHidden = true
+            queryPosts()
         presentedViewController?.dismiss(animated: true)
     }
 
@@ -39,6 +41,14 @@ class FeedViewController: UIViewController {
         tableView.allowsSelection = false
         
         NotificationCenter.default.addObserver(self, selector: #selector(postCreated), name: Notification.Name("postCreated"), object: nil)
+        view.addSubview(placeholderLabel)
+        placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            placeholderLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            placeholderLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            placeholderLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            placeholderLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+        ])
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -50,16 +60,22 @@ class FeedViewController: UIViewController {
         }
         
         if currentUser.hasPosted == true {
-            // Dismiss the alert if it is being displayed
-            presentedViewController?.dismiss(animated: true)
-            // Query and display the posts
-            queryPosts()
-        } else {
-            // Show an alert informing the user that they need to post in order to view the feed
-            showAlert(description: "You need to post in order to view the feed.")
-        }
+                placeholderLabel.isHidden = true
+                queryPosts()
+            } else {
+                placeholderLabel.isHidden = false
+            }
     }
 
+    private let placeholderLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Post to View Your Feed!"
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        label.textColor = .gray
+        label.isHidden = true
+        return label
+    }()
     
 
     private func queryPosts() {
@@ -114,7 +130,7 @@ class FeedViewController: UIViewController {
 
 extension FeedViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return posts.count
+        return placeholderLabel.isHidden ? posts.count : 0
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
