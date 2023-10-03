@@ -28,8 +28,6 @@ class FeedViewController: UIViewController {
     
     @objc private func postCreated() {
         // Dismiss the alert if it is being displayed
-        placeholderLabel.isHidden = true
-            queryPosts()
         presentedViewController?.dismiss(animated: true)
     }
 
