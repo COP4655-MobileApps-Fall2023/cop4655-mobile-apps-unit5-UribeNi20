@@ -1,9 +1,4 @@
-//
-//  PostCell.swift
-//  lab-insta-parse
-//
-//  Created by Charlie Hieger on 11/3/22.
-//
+
 
 import UIKit
 import Alamofire
@@ -19,7 +14,7 @@ class PostCell: UITableViewCell {
     private var imageDataRequest: DataRequest?
 
     func configure(with post: Post) {
-        // TODO: Pt 1 - Configure Post Cell
+
         // Username
         if let user = post.user {
             usernameLabel.text = user.username
@@ -54,7 +49,7 @@ class PostCell: UITableViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        // TODO: P1 - Cancel image download
+
         // Reset image view image.
         postImageView.image = nil
 
