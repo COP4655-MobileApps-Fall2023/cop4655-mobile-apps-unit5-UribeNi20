@@ -27,8 +27,13 @@ class FeedViewController: UIViewController {
         }
     
     @objc private func postCreated() {
-        // Dismiss the alert if it is being displayed
-        presentedViewController?.dismiss(animated: true)
+        DispatchQueue.main.async {
+            // Dismiss the alert if it is being displayed
+            self.presentedViewController?.dismiss(animated: true)
+            
+            // Refresh the feed
+            self.queryPosts()
+        }
     }
 
     override func viewDidLoad() {
