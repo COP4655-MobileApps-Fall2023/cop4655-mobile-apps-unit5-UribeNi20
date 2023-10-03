@@ -31,6 +31,9 @@ class FeedViewController: UIViewController {
             // Dismiss the alert if it is being displayed
             self.presentedViewController?.dismiss(animated: true)
             
+            // Hide the placeholder label
+            self.placeholderLabel.isHidden = true
+            
             // Refresh the feed
             self.queryPosts()
         }
