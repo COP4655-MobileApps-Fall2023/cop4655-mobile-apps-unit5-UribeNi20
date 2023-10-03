@@ -31,7 +31,7 @@ The following **additional** features are implemented:
 ## Video Walkthrough
 
 [![Watch the video](https://i.imgur.com/0kb50h0.png)](
-https://youtu.be/eBcykzqgQYg?si=8cWxfR85xBZ1K-5W)
+https://youtu.be/yUk5RokahWI?si=vYQZzbjc_Yvpa_gH)
 
 ## Notes
 
