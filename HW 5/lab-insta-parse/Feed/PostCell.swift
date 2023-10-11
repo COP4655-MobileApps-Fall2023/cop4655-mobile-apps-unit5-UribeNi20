@@ -10,10 +10,12 @@ class PostCell: UITableViewCell {
     @IBOutlet private weak var postImageView: UIImageView!
     @IBOutlet private weak var captionLabel: UILabel!
     @IBOutlet private weak var dateLabel: UILabel!
+    private var blurEffectView: UIVisualEffectView?
+
 
     private var imageDataRequest: DataRequest?
 
-    func configure(with post: Post) {
+    func configure(with post: Post, shouldBlur: Bool) {
 
         // Username
         if let user = post.user {
@@ -36,6 +38,16 @@ class PostCell: UITableViewCell {
                 }
             }
         }
+        
+        if shouldBlur {
+                let blurEffect = UIBlurEffect(style: .light)
+                blurEffectView = UIVisualEffectView(effect: blurEffect)
+                blurEffectView?.frame = postImageView.bounds
+                blurEffectView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                postImageView.addSubview(blurEffectView!)
+            } else {
+                blurEffectView?.removeFromSuperview()
+            }
 
         // Caption
         captionLabel.text = post.caption

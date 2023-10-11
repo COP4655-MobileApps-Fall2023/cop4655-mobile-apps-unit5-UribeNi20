@@ -85,6 +85,14 @@ class FeedViewController: UIViewController {
     
 
     private func queryPosts() {
+        // TODO: Pt 1 - Query Posts
+// https://github.com/parse-community/Parse-Swift/blob/3d4bb13acd7496a49b259e541928ad493219d363/ParseSwift.playground/Pages/2%20-%20Finding%20Objects.xcplaygroundpage/Contents.swift#L66
+
+        // https://github.com/parse-community/Parse-Swift/blob/3d4bb13acd7496a49b259e541928ad493219d363/ParseSwift.playground/Pages/2%20-%20Finding%20Objects.xcplaygroundpage/Contents.swift#L66
+
+        // 1. Create a query to fetch Posts
+        // 2. Any properties that are Parse objects are stored by reference in Parse DB and as such need to explicitly use `include_:)` to be included in query results.
+        // 3. Sort the posts by descending order based on the created at date
         let date = Date().addingTimeInterval(-24*60*60) // 24 hours ago
 
         let query = Post.query()
@@ -94,45 +102,10 @@ class FeedViewController: UIViewController {
             .include("user")
 
         // Fetch objects (posts) defined in query (async)
-        query.find { [weak self] result in
-            switch result {
-            case .success(let posts):
-                // Update local posts property with fetched posts
-                self?.posts = posts
-                
-                // Now, fetch the last post of the logged-in user
-                let userLastPostQuery = Post.query()
-                    .where("author" == User.current)
-                    .order([.descending("createdAt")])
-                    .limit(1)
 
-                userLastPostQuery.first { [weak self] result in
-                    switch result {
-                    case .success(let userLastPost):
-                        guard let userLastPostDate = userLastPost.createdAt else { return }
-                        // Revised filtering logic
-                        let currentPosts = self?.posts ?? [] // Provide a default empty array if self?.posts is nil
-                        let filteredPosts = currentPosts.compactMap { post -> Post? in
-                            guard let postDate = post.createdAt else { return nil }
-                            let timeInterval = postDate.timeIntervalSince(userLastPostDate)
-                            return timeInterval <= 24*60*60 ? post : nil
-                        }
 
-                        self?.posts = filteredPosts
-                        self?.tableView.reloadData()
 
-                    case .failure(let error):
-                        // Handle the error, maybe show an alert or log it
-                        print("Error fetching user's last post: \(error.localizedDescription)")
-                    }
-                }
-
-            case .failure(let error):
-                self?.showAlert(description: error.localizedDescription)
-            }
-        }
     }
-
 
     @IBAction func onLogOutTapped(_ sender: Any) {
         showConfirmLogoutAlert()
