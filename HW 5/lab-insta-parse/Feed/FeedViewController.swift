@@ -14,8 +14,7 @@ import ParseSwift
 class FeedViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
-    
-    var userLastPostDate: Date?
+
     private var posts = [Post]() {
         didSet {
             // Reload table view data any time the posts variable gets updated.
@@ -86,54 +85,36 @@ class FeedViewController: UIViewController {
     
 
     private func queryPosts() {
-        fetchUserLastPostDate { [weak self] in
-            // Now that you have userLastPostDate, you can proceed with querying the latest posts.
-            
-            let date = Date().addingTimeInterval(-24*60*60) // 24 hours ago
-            
-            let query = Post.query()
-                .where("createdAt" > date)
-                .order([.descending("createdAt")])
-                .limit(10)
-                .include("user")
-            
-            // Fetch objects (posts) defined in query (async)
-            query.find { [weak self] result in
-                switch result {
-                case .success(let posts):
-                    self?.posts = posts
-                case .failure(let error):
-                    self?.showAlert(description: error.localizedDescription)
-                }
-            }
-        }
-    
+        // TODO: Pt 1 - Query Posts
+// https://github.com/parse-community/Parse-Swift/blob/3d4bb13acd7496a49b259e541928ad493219d363/ParseSwift.playground/Pages/2%20-%20Finding%20Objects.xcplaygroundpage/Contents.swift#L66
 
-    }
+        // https://github.com/parse-community/Parse-Swift/blob/3d4bb13acd7496a49b259e541928ad493219d363/ParseSwift.playground/Pages/2%20-%20Finding%20Objects.xcplaygroundpage/Contents.swift#L66
 
-    func fetchUserLastPostDate(completion: @escaping () -> Void) {
-        guard let currentUser = User.current else {
-            completion()
-            return
-        }
+        // 1. Create a query to fetch Posts
+        // 2. Any properties that are Parse objects are stored by reference in Parse DB and as such need to explicitly use `include_:)` to be included in query results.
+        // 3. Sort the posts by descending order based on the created at date
+        let date = Date().addingTimeInterval(-24*60*60) // 24 hours ago
 
-        let userLastPostQuery = Post.query()
-            .where("author" == currentUser)
+        let query = Post.query()
+            .where("createdAt" > date)
             .order([.descending("createdAt")])
-            .limit(1)
+            .limit(10)
+            .include("user")
 
-        userLastPostQuery.first { [weak self] result in
+        // Fetch objects (posts) defined in query (async)
+        query.find { [weak self] result in
             switch result {
-            case .success(let userLastPost):
-                self?.userLastPostDate = userLastPost.createdAt
+            case .success(let posts):
+                // Update local posts property with fetched posts
+                self?.posts = posts
             case .failure(let error):
-                print("Error fetching user's last post: \(error.localizedDescription)")
+                self?.showAlert(description: error.localizedDescription)
             }
-            completion()
         }
+
+
     }
 
-    
     @IBAction func onLogOutTapped(_ sender: Any) {
         showConfirmLogoutAlert()
     }
@@ -159,22 +140,17 @@ class FeedViewController: UIViewController {
 }
 
 extension FeedViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return placeholderLabel.isHidden ? posts.count : 0
+    }
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as? PostCell else {
             return UITableViewCell()
         }
-
-        let post = posts[indexPath.row]
-        let shouldBlur: Bool
-        if let userLastPostDate = userLastPostDate, let postDate = post.createdAt {
-            let timeInterval = postDate.timeIntervalSince(userLastPostDate)
-            shouldBlur = timeInterval > 24*60*60
-        } else {
-            shouldBlur = false
-        }
-        cell.configure(with: post, shouldBlur: shouldBlur)
-
+        cell.configure(with: posts[indexPath.row])
         return cell
     }
+}
 
 extension FeedViewController: UITableViewDelegate { }
